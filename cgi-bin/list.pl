@@ -27,3 +27,44 @@ if(defined($owner)){
   print STDERR "nose ingreso datos\n";
   print renderXML();
 }
+
+sub buscarBD{
+  my $owner = $_[0];
+  my $user = 'alumno';
+  my $password = 'pweb1';
+  my $dsn="DBI:MariaDB:database=pweb1;host=192.168.1.23";
+
+  my $dbh = DBI->connect($dsn, $user, $password) or die
+  ('No se pudo conectar');
+  my $sql = "SELECT title FROM Articles WHERE owner=?";
+  my $sth = $dbh->prepare($sql);
+  $sth->execute($owner);
+  my @articles;
+  while(my @row = $sth->fetchrow_array){
+    push(@articles, @row);
+  }
+  return @articles;
+}
+
+sub renderCuerpo{
+  my @titulos = @_;
+  my $len = @titulos;
+  my $lista = "";
+  for (my $i = 0 ; $i < $len-1; $i++){
+    $lista .= "     <article>
+         <owner>$titulos[$len-1]</owner>
+         <title>$titulos[$i]</title>
+      </article>\n";
+  }
+  return $lista;
+}
+sub renderXML{
+  my $cuerpoxml = $_[0];
+  my $xml = <<"XML";
+<?xml version= '1.0' encoding = 'utf-8'?>  
+   <articles>
+   $cuerpoxml
+   </articles>
+XML
+  return $xml;
+}
