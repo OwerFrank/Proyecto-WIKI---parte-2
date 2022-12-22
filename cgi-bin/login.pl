@@ -33,3 +33,43 @@ if(defined($user) and defined($password)){
   print STDERR "No ingreso los dos datos\n";
   print renderXML('Hola');
 }
+sub checkLogin{
+  my $userQuery = $_[0];
+  my $passwordQuery = $_[1];
+
+  my $user = 'alumno';
+  my $password = 'pweb1';
+  my $dsn = 'DBI:MariaDB:database=pweb1;host=192.168.1.23';
+  my $dbh = DBI->connect($dsn, $user, $password) or die
+  die("No se pudo conectar!");
+
+  my $sql = "SELECT * FROM Users WHERE userName=? AND password=?";
+  my $sth = $dbh->prepare($sql);
+  $sth->execute($userQuery, $passwordQuery);
+  my @row = $sth->fetchrow_array;
+  $sth->finish;
+  $dbh->disconnect;
+  return @row;
+  print "salida de funcion@row\n";
+}
+
+sub renderCuerpo{
+  my @linea = @_;
+  my $cuerpo = <<"CUERPO";
+      <owner>$linea[0]</owner>
+      <firstName>$linea[3]</firstName>
+      <lastName>$linea[2]</lastName>
+CUERPO
+  return $cuerpo;
+}
+
+sub renderXML{
+  my $cuerpoxml = $_[0];
+  my $xml = <<"XML";
+<?xml version='1.0' encoding= 'utf-8'?>
+  <user>
+   $cuerpoxml
+  </user>
+XML
+  return $xml
+}
