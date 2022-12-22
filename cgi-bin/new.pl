@@ -45,3 +45,54 @@ sub insertaBD{
   $sth->finish;
   $dbh->disconnect;
 }
+
+sub buscarBD{
+  my @campos =@_;
+  my $user = 'alumno';
+  my $password = 'pweb1';
+  my $dsn = 'DBI:MariaDB:database=pweb1;host=192.168.1.23';
+  my $dbh = DBI->connect($dsn, $user, $password) or die
+  die("No se pudo conectar!");
+  my $sql = "SELECT title, text FROM Articles WHERE title=? AND owner=? AND text=?";
+  my $sth = $dbh->prepare($sql);
+  $sth->execute($campos[0],$campos[2],$campos[1]);
+  my @row =$sth->fetchrow_array;
+
+  $sth->finish;
+  $dbh->disconnect;
+  return @row;
+}
+sub renderXML{
+  my $cuerpoxml = $_[0];
+  my $xml = <<"XML";
+<?xml version='1.0' encoding= 'utf-8'?>
+      <article>
+        $cuerpoxml
+      </article>
+XML
+  return $xml
+}
+
+sub renderCuerpo{
+  my @linea = @_;
+  my $cuerpo = <<"CUERPO";
+      <title>$linea[0]</title>
+      <text>$linea[1]</text>
+CUERPO
+  return $cuerpo;
+}
+
+
+
+sub validarArray{
+  my @array = @_;
+  my $contador=0;
+  foreach my $elemento(@array){
+    if (defined($elemento)){
+      $contador++;
+    }
+  }
+  return $contador;
+
+}
+
