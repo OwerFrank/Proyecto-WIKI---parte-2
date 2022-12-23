@@ -33,3 +33,25 @@ if(defined($title) and defined($owner)){
   print STDERR "No lleno todos los campos\n";
   print renderXML();
 }
+
+sub buscarBD{
+  my $owner =$_[0];
+  my $title = $_[1];
+  my $user = 'alumno';
+  my $password = 'pweb1';
+  my $dsn="DBI:MariaDB:database=pweb1;host=192.168.1.23";
+  my $dbh = DBI->connect($dsn, $user, $password) or die
+  die("No se pudo conectar!");
+  my $sql = "SELECT title FROM Articles WHERE owner=? AND title=?";
+  my $sth = $dbh->prepare($sql);
+  $sth->execute($owner,$title);
+  my @articles;
+  while(my @row=$sth->fetchrow_array){
+    push(@articles, @row);
+
+  }
+
+  $sth->finish;
+  $dbh->disconnect;
+  return @articles;
+}
