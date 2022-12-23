@@ -55,3 +55,27 @@ sub buscarBD{
   $dbh->disconnect;
   return @articles;
 }
+
+sub insertBD{   #Ademas esta subrutina me devolvera lo solicitado en la tarea, para no abrir nuevamente la BD
+  my $owner =$_[0];
+  my $title = $_[1];
+  my $text = $_[2];
+  my $user = 'alumno';
+  my $password = 'pweb1';
+  my $dsn="DBI:MariaDB:database=pweb1;host=192.168.1.23";
+  my $dbh = DBI->connect($dsn, $user, $password) or die
+  die("No se pudo conectar!");
+  my $sql = "UPDATE Articles SET text=? WHERE owner=? AND title=?";
+  my $sth = $dbh->prepare($sql);
+  $sth->execute($text,$owner, $title);
+  $sth->finish;
+  my $sql2 = "SELECT text FROM Articles WHERE owner=? AND title=?";
+  my $sth1 = $dbh->prepare($sql2);
+  $sth1->execute($owner, $title);
+  my @articles;
+  while (my @row=$sth1->fetchrow_array){
+    push(@articles, @row);
+  }
+  return @articles;
+  $dbh->disconnect;
+}
