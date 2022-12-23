@@ -28,3 +28,61 @@ if(defined($owner) and defined($title)){
   print STDERR "no lleno nada\n";
   print renderXML();
 }
+
+sub buscarBD{
+  my $owner =$_[0];
+  my $title = $_[1];
+  my $user = 'alumno';
+  my $password = 'pweb1';
+  my $dsn="DBI:MariaDB:database=pweb1;host=192.168.1.23";
+  my $dbh = DBI->connect($dsn, $user, $password) or die
+  die("No se pudo conectar!");
+  my $sql = "SELECT title FROM Articles WHERE owner=? AND title=?";
+  my $sth = $dbh->prepare($sql);
+  $sth->execute($owner,$title);
+  my @articles;
+  while(my @row=$sth->fetchrow_array){
+    push(@articles, @row);
+
+  }
+
+  $sth->finish;
+  $dbh->disconnect;
+  return @articles;
+}
+
+sub eliminarBD{
+  my $owner =$_[0];
+  my $title = $_[1];
+  my $user = 'alumno';
+  my $password = 'pweb1';
+  my $dsn="DBI:MariaDB:database=pweb1;host=192.168.1.23";
+  my $dbh = DBI->connect($dsn, $user, $password) or die
+  die("No se pudo conectar!");
+  my $sql = "DELETE FROM Articles WHERE owner=? AND title=?";
+  my $sth = $dbh->prepare($sql);
+  $sth->execute($owner,$title);
+  $sth->finish;
+  $dbh->disconnect;
+}
+
+sub renderCuerpo{
+  my $owner = $_[0];
+  my $title = $_[1];
+  my $cuerpo = <<"CUERPO";
+            <owner>$owner</owner>
+                <title>$title</title>
+CUERPO
+  return $cuerpo;
+}
+
+sub renderXML{
+  my $cuerpoxml = $_[0];
+  my $xml = <<"XML";
+<?xml version='1.0' encoding= 'utf-8'?>
+      <article>
+        $cuerpoxml
+      </article>
+XML
+  return $xml
+}
