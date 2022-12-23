@@ -79,3 +79,25 @@ sub insertBD{   #Ademas esta subrutina me devolvera lo solicitado en la tarea, p
   return @articles;
   $dbh->disconnect;
 }
+
+sub renderCuerpo{
+  my $text = $_[0];
+  my $title = $_[1];
+  my $cuerpo = <<"CUERPO";
+                 <title>$title</title>
+                 <text>$text</text>
+CUERPO
+  return $cuerpo;
+}
+
+sub renderXML{
+  my $cuerpoxml = $_[0];
+  my $xml = <<"XML";
+<?xml version='1.0' encoding= 'utf-8'?>
+      <article>
+        $cuerpoxml
+      </article>
+XML
+  return $xml
+}
+
